@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+        springboot-api-demo:
+                image: "otm-image"
+                mem_limit: 1024m
+                ports:
+                        - "9090:9090"
+                environment:
+                        - SPRING_PROFILES_ACTIVE=local
+                        - AWS_REGION=local
+                        - ENVIRONMENT=local
+                        - AUTH_ENABLED=false
+        postgres:
+                container_name: pg-docker
+                image: postgres:9.6-alpine
+                environment:
+                        - 'POSTGRES_ROOT_PASSWORD=postgres'
+                        - 'POSTGRES_USER=postgres'
+                        - 'POSTGRES_PASSWORD=docker'
+                ports:
+                        - "5432:5432"
