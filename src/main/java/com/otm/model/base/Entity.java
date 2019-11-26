@@ -2,10 +2,8 @@ package com.otm.model.base;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import javax.persistence.MappedSuperclass;
 import java.util.Date;
 
-@MappedSuperclass
 public class Entity extends BaseEntity {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")

@@ -1,29 +1,32 @@
 package com.otm.controller;
 
-import com.otm.model.Otm;
 import com.otm.model.dto.OtmDTO;
 import com.otm.service.Impl.OtmService;
-import com.sun.media.sound.InvalidDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.InvalidObjectException;
 
 @RestController
 @RequestMapping("/otm")
 public class MainController {
 
-	@Autowired
-	private OtmService otmService;
+    @Autowired
+    private OtmService otmService;
 
-	@RequestMapping(value = "/post", method = RequestMethod.GET)
-	public ResponseEntity postOTM(@RequestParam String message) throws InvalidDataException {
-		return otmService.post(new OtmDTO(message));
-	}
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity postOTM(@RequestParam String message) throws InvalidObjectException {
+        return otmService.post(new OtmDTO(message));
+    }
 
-	@RequestMapping(value = "/get", method = RequestMethod.GET)
-	public ResponseEntity getOTM(@RequestParam String keyMessage) throws InvalidDataException {
-		return otmService.get(keyMessage);
-	}
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity getOTM(@RequestParam String keyMessage) {
+        return otmService.get(keyMessage);
+    }
 
 
 }

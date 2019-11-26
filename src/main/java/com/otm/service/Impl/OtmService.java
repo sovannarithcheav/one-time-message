@@ -1,53 +1,41 @@
 package com.otm.service.Impl;
 
-import com.otm.dao.OtmDao;
 import com.otm.model.Otm;
+import com.otm.model.component.OTMs;
 import com.otm.model.dto.OtmDTO;
 import com.otm.service.IOtmService;
-import com.otm.util.KeyGenerator;
-import com.sun.media.sound.InvalidDataException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ResourceNotFoundException;
-import org.springframework.core.io.Resource;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.InvalidObjectException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.UUID;
 
 @Service
 public class OtmService implements IOtmService {
 
-	@Autowired
-	private OtmDao otmDao;
+    @Override
+    public ResponseEntity post(OtmDTO otmDTO) throws InvalidObjectException {
+        if (!otmDTO.validate()) {
+            throw new InvalidObjectException("Invalid message");
+        }
+        Otm otm = new Otm();
+        String uuid = RandomString.make(10);
+        otm.setKeyMessage(uuid);
+        otm.setMessage(otmDTO.getMessage());
+        OTMs.message.put(uuid, otm);
+        return new ResponseEntity<>(otm.getKeyMessage(), HttpStatus.OK);
+    }
 
-	@Override
-	public ResponseEntity post(OtmDTO otmDTO) throws InvalidDataException {
-		if (!otmDTO.validate()) {
-			throw new InvalidDataException();
-		}
-		Otm otm = new Otm();
-		String uuid = KeyGenerator.getStandardRandomAlphabetic();
-		otm.setKeyMessage(uuid);
-		otm.setMessage(otmDTO.getMessage());
-		otmDao.save(otm);
-		HashMap<String, Object> data = new HashMap();
-		data.put("keyMessage", otm.getKeyMessage());
-		data.put("message", otm.getMessage());
-		return new ResponseEntity(data,HttpStatus.OK);
-	}
-
-	@Override
-	public ResponseEntity get(String uuid) {
-		Otm otm = otmDao.findFirstByStatusAndKeyMessage("active", uuid);
-		if (otm == null) throw new ResourceNotFoundException(uuid, null);
-		otm.setStatus("seen");
-		otm.setUpdatedAt(new Date());
-		otmDao.save(otm);
-		HashMap<String, Object> data = new HashMap();
-		data.put("message", otm.getMessage());
-		return new ResponseEntity(data, HttpStatus.OK);
-	}
+    @Override
+    public ResponseEntity get(String uuid) {
+        Otm message = OTMs.message.get(uuid);
+        if (message == null) return new ResponseEntity<>("message not found", HttpStatus.NOT_FOUND);
+        if (message.getStatus().equals("seen")) return new ResponseEntity<>("message is locked", HttpStatus.LOCKED);
+        message.setStatus("seen");
+        message.setUpdatedAt(new Date());
+        return new ResponseEntity<>(message.getMessage(), HttpStatus.OK);
+    }
 }

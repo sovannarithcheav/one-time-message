@@ -1,13 +1,14 @@
 package com.otm.service;
 
 import com.otm.model.dto.OtmDTO;
-import com.sun.media.sound.InvalidDataException;
 import org.springframework.http.ResponseEntity;
+
+import java.io.InvalidObjectException;
 
 public interface IOtmService {
 
-	ResponseEntity post(OtmDTO otm) throws InvalidDataException;
+    ResponseEntity post(OtmDTO otm) throws InvalidObjectException;
 
-	ResponseEntity get(String uuid);
+    ResponseEntity get(String uuid);
 
 }
